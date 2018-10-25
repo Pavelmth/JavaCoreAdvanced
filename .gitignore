@@ -1,1 +1,6 @@
 *.xml
+*.class
+*.lst
+*.0.0.jar
+*.pavelm.javacoreadvanced.AppTest.txt
+*.properties
