@@ -1,11 +1,14 @@
 package ru.pavelm.javacoreadvanced;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println("One stream");
-        zeroCalc();
-        System.out.println("\nuse class Thread");
-        firstCalc();
+        //System.out.println("One stream");
+        //zeroCalc();
+        //System.out.println("\nuse class Thread");
+        //firstCalc();
         System.out.println("\nuse Lambda");
         secondCalc();
     }
@@ -73,7 +76,7 @@ public class App {
         }
 
         final long a = System.currentTimeMillis();
-        final int numberThreads = 4;
+        final int numberThreads = 8;
         final int h = arr.length / numberThreads;
         float[][] mass = new float[numberThreads][h];
 
@@ -87,15 +90,48 @@ public class App {
 
         System.out.println("Checking value - " + arr[1]);//fvwrfevqrfevcqewrfcvqerfcrdfqdwcwddrewcqdewcccccccccccccccccccccccccccccccccccccccccccccccccc
 
-        for (float[] arrT: mass) {
-            new Thread(() -> {
-                for (int i = 0; i < h; i++) {
-                    arrT[i] = (float) (arrT[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
-                }
-            }).start();
-        }
+        final int[] n = {0};
 
-        System.out.println("Calculating time by " + numberThreads + " threads: " + (System.currentTimeMillis() - b));
+        Thread[] t = new Thread[numberThreads];
+        for (int i = 0; i < numberThreads; i++) {
+            final int nnn = i;
+            t[i] = new Thread(() -> {
+                for (int j = 0; j < h; j++) {
+                    mass[nnn][j] = (float) (mass[nnn][j] * Math.sin(0.2f + (j*nnn) / 5) * Math.cos(0.2f + (j*nnn) / 5) * Math.cos(0.4f + (j*nnn) / 2));
+                }
+            });
+            t[i].start();
+
+            try {
+                t[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Merging time of array: " + (System.currentTimeMillis() - b));
+//        Thread[] t = new Thread[numberThreads];
+//        for (int i = 0; i < numberThreads; i++) {
+//            // будем копировать в двумерный массив данные из основного потока со сдвигом
+//            final int u = i;
+//            t[i] = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    // считаем массив со сдвигом
+//                    int n = u * h;
+//                    for (int j = 0; j < h; j++, n++) {
+//                        mass[u][j] = (float) (mass[u][j] * Math.sin(0.2f + n / 5) * Math.cos(0.2f + n / 5) * Math.cos(0.4f + n / 2));
+//                    }
+//                }
+//            });
+//            t[i].start();
+//        }
+//        try {
+//            for (int i = 0; i < numberThreads; i++) {
+//                t[i].join();
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         System.out.println("Checking value - " + mass[0][1]);//cccdcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
